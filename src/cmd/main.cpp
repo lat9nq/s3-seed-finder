@@ -27,7 +27,7 @@ int main(const int argc, char* const* argv) {
     std::string filepath;
     int option_index = 0;
     while (optind < argc) {
-        const int arg = getopt_long(argc, argv, "h", longopts, &option_index);
+        const int arg = getopt_long(argc, argv, "f:h", longopts, &option_index);
         if (arg == -1) {
             filepath = argv[optind];
             optind++;
@@ -52,6 +52,8 @@ int main(const int argc, char* const* argv) {
         return 0;
     }
 
+    ScanInfo scan_info;
+
     std::unique_ptr<u_int8_t[]> file_data = std::make_unique<u_int8_t[]>(buffer_size);
 
     file_stream.read(reinterpret_cast<char*>(file_data.get()), buffer_size);
@@ -59,8 +61,12 @@ int main(const int argc, char* const* argv) {
 
     std::string json_text;
 
-    scan_data(file_data.get(), buffer_size, json_text);
+    scan_data(file_data.get(), buffer_size, json_text, scan_info);
 
+    std::fprintf(stderr,
+                 "Found seeds:\nHeadgear: %d @ 0x%08x\nClothes: %d @ 0x%08x\nShoes: %d @ 0x%08x\n",
+                 scan_info.headgear_count, scan_info.headgear_address, scan_info.clothes_count,
+                 scan_info.clothes_address, scan_info.shoes_count, scan_info.shoes_address);
     std::printf("%s\n", json_text.c_str());
 
     return 0;

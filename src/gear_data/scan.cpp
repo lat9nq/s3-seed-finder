@@ -70,7 +70,8 @@ nlohmann::json items_to_json(const GearItem* items) {
     return json_data;
 }
 
-void scan_data(const u_int8_t* data, const std::size_t length, std::string& json_text) {
+void scan_data(const u_int8_t* data, const std::size_t length, std::string& json_text,
+               ScanInfo& scan_info) {
     const u_int32_t search_result = find(data, length, 0x10, gear_marker);
     const u_int32_t first_headgear = search_result - 0x10;
     const u_int32_t first_clothes = first_headgear + gear_region_delta;
@@ -79,9 +80,12 @@ void scan_data(const u_int8_t* data, const std::size_t length, std::string& json
     GearItem* headgear = nullptr;
     GearItem* clothes = nullptr;
     GearItem* shoes = nullptr;
-    load_gear_items(&headgear, first_headgear, data, length);
-    load_gear_items(&clothes, first_clothes, data, length);
-    load_gear_items(&shoes, first_shoes, data, length);
+    scan_info.headgear_count = load_gear_items(&headgear, first_headgear, data, length);
+    scan_info.clothes_count = load_gear_items(&clothes, first_clothes, data, length);
+    scan_info.shoes_count = load_gear_items(&shoes, first_shoes, data, length);
+    scan_info.headgear_address = first_headgear - 0x40;
+    scan_info.clothes_address = first_clothes - 0x40;
+    scan_info.shoes_address = first_shoes - 0x40;
 
     nlohmann::json json_data = nlohmann::json::object();
 
