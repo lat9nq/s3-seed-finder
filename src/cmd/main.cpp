@@ -57,8 +57,6 @@ int main(const int argc, char* const* argv) {
     file_stream.read(reinterpret_cast<char*>(file_data.get()), buffer_size);
     file_stream.close();
 
-    //~ std::printf("%08x\n", *reinterpret_cast<u_int32_t*>(file_data.get() + 0xa93a0));
-
     std::string json_text;
 
     scan_data(file_data.get(), buffer_size, json_text);

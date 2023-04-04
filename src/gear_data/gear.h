@@ -2,6 +2,7 @@
 #include <cstdlib>
 
 enum class Ability : u_int32_t {
+    Scrubbed = 0x0,
     InkSaverMain = 0x1,
     InkSaverSub = 0x2,
     InkRecoveryUp = 0x3,
@@ -27,8 +28,15 @@ enum class Ability : u_int32_t {
     AbilityDoubler = 0x17,
     StealthJump = 0x18,
     ObjectShredder = 0x19,
-    DropRoller = 0x1f,
+    DropRoller = 0x1a,
 };
+
+constexpr int lean_ab_map[32] = {-1, 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11, 12,
+                                 13, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111};
+
+constexpr int to_lean_ab(Ability ab) {
+    return lean_ab_map[static_cast<u_int32_t>(ab)];
+}
 
 constexpr u_int32_t gear_size = 0xB0;
 
