@@ -7,11 +7,6 @@
 #include "gear.h"
 #include "scan.h"
 
-// An apparently repeating int for each gear item
-// Not sure where all it appears or if it's exclusive to gear
-// Lands us immediately after the first gear item id (+0x10)
-constexpr u_int32_t gear_marker = 0x4ccaf9b0;
-
 // Delta between offset for headgear and clothes, or clothes to shoes
 constexpr u_int32_t gear_region_delta = 0x2c020;
 
@@ -71,9 +66,30 @@ nlohmann::json items_to_json(const GearItem* items) {
 }
 
 void scan_data(const u_int8_t* data, const std::size_t length, std::string& json_text,
-               ScanInfo& scan_info) {
-    const u_int32_t search_result = find(data, length, 0x10, gear_marker);
-    const u_int32_t first_headgear = search_result - 0x10;
+               u_int32_t seed, ScanInfo& scan_info) {
+    const u_int32_t search_result = find(data, length, 0x10, seed);
+    const u_int32_t found_item = search_result - 0x80;
+
+    // Find the first gear item in the pile
+    u_int32_t current = found_item;
+    GearItem test;
+    std::memcpy(&test, data + found_item, gear_size);
+    while (test.id != 0) {
+        current -= gear_size;
+        std::memcpy(&test, data + current, gear_size);
+    }
+    current += gear_size;
+
+    // Find the first pile of gear items
+    u_int32_t pile = current;
+    std::memcpy(&test, data + pile, gear_size);
+    while (test.seed != 0) {
+        pile -= gear_region_delta;
+        std::memcpy(&test, data + pile, gear_size);
+    }
+    pile += gear_region_delta;
+
+    const u_int32_t first_headgear = pile;
     const u_int32_t first_clothes = first_headgear + gear_region_delta;
     const u_int32_t first_shoes = first_clothes + gear_region_delta;
 
