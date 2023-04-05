@@ -47,8 +47,7 @@ int load_gear_items(GearItem** gear_items, const u_int32_t address, const u_int8
     return count;
 }
 
-nlohmann::json items_to_json(const GearItem* items) {
-    nlohmann::json json_data;
+nlohmann::json items_to_json(const GearItem* items, nlohmann::json& json_data) {
     for (int i = 0; items[i].id != 0; i++) {
         char id[32];
         std::snprintf(id, 32, "%d", items[i].id);
@@ -65,17 +64,36 @@ nlohmann::json items_to_json(const GearItem* items) {
     return json_data;
 }
 
-void scan_data(const u_int8_t* data, const std::size_t length, std::string& json_text,
+void scan_data(const u_int8_t* data, const std::size_t length, nlohmann::json& json_data,
                u_int32_t seed, ScanInfo& scan_info) {
     const u_int32_t search_result = find(data, length, 0x10, seed);
+
+    if (search_result == no_result) {
+        return;
+    }
+
     const u_int32_t found_item = search_result - 0x80;
+
+    if (found_item > search_result) {
+        return;
+    }
 
     // Find the first gear item in the pile
     u_int32_t current = found_item;
     GearItem test;
     std::memcpy(&test, data + found_item, gear_size);
+    if (!validate(test)) {
+        return;
+    }
+
     while (test.id != 0) {
         current -= gear_size;
+        if (current > length) {
+            return;
+        }
+        if (!validate(test)) {
+            return;
+        }
         std::memcpy(&test, data + current, gear_size);
     }
     current += gear_size;
@@ -85,6 +103,12 @@ void scan_data(const u_int8_t* data, const std::size_t length, std::string& json
     std::memcpy(&test, data + pile, gear_size);
     while (test.seed != 0) {
         pile -= gear_region_delta;
+        if (pile > length) {
+            return;
+        }
+        if (!validate(test)) {
+            return;
+        }
         std::memcpy(&test, data + pile, gear_size);
     }
     pile += gear_region_delta;
@@ -103,14 +127,9 @@ void scan_data(const u_int8_t* data, const std::size_t length, std::string& json
     scan_info.clothes_address = first_clothes - 0x40;
     scan_info.shoes_address = first_shoes - 0x40;
 
-    nlohmann::json json_data = nlohmann::json::object();
-
-    json_data["GearDB"]["HaveGearHeadMap"] = items_to_json(headgear);
-    json_data["GearDB"]["HaveGearClothesMap"] = items_to_json(clothes);
-    json_data["GearDB"]["HaveGearShoesMap"] = items_to_json(shoes);
-
-    json_text.clear();
-    json_text = json_data.dump();
+    items_to_json(headgear, json_data["GearDB"]["HaveGearHeadMap"]);
+    items_to_json(clothes, json_data["GearDB"]["HaveGearClothesMap"]);
+    items_to_json(shoes, json_data["GearDB"]["HaveGearShoesMap"]);
 
     delete headgear;
     delete clothes;

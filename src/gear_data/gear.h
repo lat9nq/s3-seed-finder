@@ -29,9 +29,10 @@ enum class Ability : u_int32_t {
     StealthJump = 0x18,
     ObjectShredder = 0x19,
     DropRoller = 0x1a,
+    Max = 0x1b,
 };
 
-constexpr int lean_ab_map[32] = {-1, 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11, 12,
+constexpr int lean_ab_map[27] = {-1, 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11, 12,
                                  13, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111};
 
 constexpr int to_lean_ab(Ability ab) {
@@ -52,3 +53,25 @@ typedef struct __attribute__((packed)) {
 } GearItem;
 
 static_assert(sizeof(GearItem) == gear_size, "Gear item structure size is wrong");
+
+constexpr bool validate(GearItem& item) {
+    if (item.id == 0) {
+        return false;
+    }
+
+    if (item.main >= Ability::Max || item.main == Ability::Scrubbed) {
+        return false;
+    }
+
+    for (int i = 0; i < 3; i++) {
+        if (item.subs[i] >= Ability::Max) {
+            return false;
+        }
+    }
+
+    if (item.seed == 0) {
+        return false;
+    }
+
+    return true;
+}
