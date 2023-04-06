@@ -52,6 +52,7 @@ MainWindow::MainWindow() {
     entry_offset_headgear = GTK_ENTRY(gtk_builder_get_object(builder, "entry_offset_headgear"));
     entry_offset_clothes = GTK_ENTRY(gtk_builder_get_object(builder, "entry_offset_clothes"));
     entry_offset_shoes = GTK_ENTRY(gtk_builder_get_object(builder, "entry_offset_shoes"));
+    statusbar_main = GTK_STATUSBAR(gtk_builder_get_object(builder, "statusbar_main"));
 
     g_object_ref(window_main);
     g_object_unref(builder);
@@ -70,23 +71,91 @@ void MainWindow::UpdateUi() {
     while ((current = gtk_list_box_get_row_at_index(list_box_gear, 0)) != nullptr) {
         gtk_widget_destroy(GTK_WIDGET(current));
     }
+    row_id.clear();
 
     std::function<void(GearItem*, int, Category)> populate_list =
         [&](GearItem* gear_list, int gear_count, Category gear_type) {
             char buf[255];
             for (int i = 0; i < gear_count; i++) {
-                const std::string key = leanny_db.GetCode(gear_list[i].id, gear_type);
+                const u_int32_t id = gear_list[i].id;
+                const std::string key = leanny_db.GetCode(id, gear_type);
                 const std::string name = leanny_db.LocalizedGearName(key);
                 std::snprintf(buf, 255, "%s", name.c_str());
                 GtkWidget* gear_label = gtk_label_new(buf);
                 gtk_widget_set_halign(gear_label, GTK_ALIGN_START);
                 gtk_list_box_insert(list_box_gear, gear_label, -1);
                 gtk_widget_show(gear_label);
+
+                row_id.push_back(std::make_tuple(id, gear_type, i));
             }
         };
     populate_list(scan_info.headgear, scan_info.headgear_count, Category::Headgear);
     populate_list(scan_info.clothes, scan_info.clothes_count, Category::Clothes);
     populate_list(scan_info.shoes, scan_info.shoes_count, Category::Shoes);
+
+    char headgear_address[11];
+    char clothes_address[11];
+    char shoes_address[11];
+
+    std::snprintf(headgear_address, 11, "0x%08x", scan_info.headgear_address);
+    std::snprintf(clothes_address, 11, "0x%08x", scan_info.clothes_address);
+    std::snprintf(shoes_address, 11, "0x%08x", scan_info.shoes_address);
+
+    gtk_entry_set_text(entry_offset_headgear, headgear_address);
+    gtk_entry_set_text(entry_offset_clothes, clothes_address);
+    gtk_entry_set_text(entry_offset_shoes, shoes_address);
+}
+
+void MainWindow::UpdateGearView(GtkListBoxRow* row) {
+    char id_str[64];
+    char seed_str[64];
+    const int index = gtk_list_box_row_get_index(row);
+    if (index < 0) {
+        return;
+    }
+    const u_int32_t id = std::get<0>(row_id[index]);
+    const Category category = std::get<1>(row_id[index]);
+    const u_int32_t gear_index = std::get<2>(row_id[index]);
+    const std::string key = leanny_db.GetCode(id, category);
+    const std::string name = leanny_db.LocalizedGearName(key);
+    const std::string brand = leanny_db.GetBrand(id, category);
+    const std::string brand_loc = leanny_db.LocalizedBrand(brand);
+
+    const auto& gear_info = [&]() {
+        GearItem* gear_list{};
+        switch (category) {
+        case Category::Headgear: {
+            gear_list = scan_info.headgear;
+        } break;
+        case Category::Clothes: {
+            gear_list = scan_info.clothes;
+        } break;
+        case Category::Shoes: {
+            gear_list = scan_info.shoes;
+        } break;
+        default:
+            break;
+        }
+        return gear_list[gear_index];
+    }();
+
+    std::snprintf(id_str, 64, "%d", id);
+    std::snprintf(seed_str, 64, "0x%08x", gear_info.seed);
+
+    const char* main_internal = ability_internal_name[static_cast<u_int32_t>(gear_info.main)];
+    const char* sub_a_internal = ability_internal_name[static_cast<u_int32_t>(gear_info.subs[0])];
+    const char* sub_b_internal = ability_internal_name[static_cast<u_int32_t>(gear_info.subs[1])];
+    const char* sub_c_internal = ability_internal_name[static_cast<u_int32_t>(gear_info.subs[2])];
+
+    gtk_entry_set_text(entry_name, name.c_str());
+    gtk_entry_set_text(entry_id_number, id_str);
+    gtk_entry_set_text(entry_id_code, key.c_str());
+    gtk_entry_set_text(entry_brand, brand_loc.c_str());
+    gtk_entry_set_text(entry_main, leanny_db.LocalizedAbility(main_internal).c_str());
+    gtk_entry_set_text(entry_sub_a, leanny_db.LocalizedAbility(sub_a_internal).c_str());
+    gtk_entry_set_text(entry_sub_b, leanny_db.LocalizedAbility(sub_b_internal).c_str());
+    gtk_entry_set_text(entry_sub_c, leanny_db.LocalizedAbility(sub_c_internal).c_str());
+    gtk_entry_set_text(entry_seed, seed_str);
 }
 
 void MainWindow::SetSearchSeed() {
@@ -179,16 +248,18 @@ void MainWindow::ImportBinaryDump() {
 
     ScanData(dump_data, dump_size, json_data, search_seed, scan_info);
 
-    if (scan_info.headgear_count == 0 && scan_info.clothes_count == 0 &&
-        scan_info.shoes_count == 0) {
-        std::fprintf(stderr, "No gear seeds were found\n");
+    char message[255];
+    const int sum = scan_info.headgear_count + scan_info.clothes_count + scan_info.shoes_count;
+    if (sum == 0) {
+        std::snprintf(message, 255, "No results");
     } else {
-        std::fprintf(
-            stderr,
-            "Found seeds:\nHeadgear: %d @ 0x%08x\nClothes: %d @ 0x%08x\nShoes: %d @ 0x%08x\n",
-            scan_info.headgear_count, scan_info.headgear_address, scan_info.clothes_count,
-            scan_info.clothes_address, scan_info.shoes_count, scan_info.shoes_address);
+        std::snprintf(message, 255, "Found gear: %d headgear, %d clothes, %d shoes (%d total)",
+                      scan_info.headgear_count, scan_info.clothes_count, scan_info.shoes_count,
+                      sum);
     }
+
+    const int context_id = gtk_statusbar_get_context_id(statusbar_main, "scan result");
+    gtk_statusbar_push(statusbar_main, context_id, message);
 
     UpdateUi();
 }
@@ -196,6 +267,12 @@ void MainWindow::ImportBinaryDump() {
 void on_list_box_gear_row_selected(GtkListBox* self, GtkListBoxRow* row, gpointer user_data) {
     MainWindow* main_window = static_cast<MainWindow*>(user_data);
     assert(self == main_window->list_box_gear);
+
+    if (row == nullptr) {
+        return;
+    }
+
+    main_window->UpdateGearView(row);
 }
 
 void on_window_main_destroy(GtkWindow* self, gpointer user_data) {

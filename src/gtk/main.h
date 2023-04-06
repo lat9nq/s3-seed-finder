@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdlib>
+#include <utility>
+#include <vector>
 #include <gtk/gtk.h>
 #include <nlohmann/json.hpp>
 #include "gear_data/leanny.h"
@@ -14,6 +16,7 @@ public:
     void UpdateUi();
     void SetSearchSeed();
     void ImportBinaryDump();
+    void UpdateGearView(GtkListBoxRow* row);
 
     GtkWindow* window_main;
     GtkMenuItem* menu_item_import_binary_dump;
@@ -50,17 +53,16 @@ public:
     GtkEntry* entry_offset_headgear;
     GtkEntry* entry_offset_clothes;
     GtkEntry* entry_offset_shoes;
+    GtkStatusbar* statusbar_main;
 
 private:
     u_int32_t search_seed{0};
+    std::vector<std::tuple<u_int32_t, Category, u_int32_t>> row_id;
 
     u_int8_t* dump_data{nullptr};
     std::size_t dump_size{0};
-
     nlohmann::json json_data{};
-
     ScanInfo scan_info{};
-
     LeannyDB leanny_db{};
 };
 
