@@ -40,7 +40,7 @@ int load_gear_items(GearItem** gear_items, const u_int32_t address, const u_int8
             array_length <<= 1;
             GearItem* old = *gear_items;
             *gear_items = temp;
-            delete old;
+            delete[] old;
         }
     }
 
@@ -127,11 +127,17 @@ void scan_data(const u_int8_t* data, const std::size_t length, nlohmann::json& j
     scan_info.clothes_address = first_clothes - 0x40;
     scan_info.shoes_address = first_shoes - 0x40;
 
+    if (scan_info.headgear != nullptr) {
+        delete[] scan_info.headgear;
+        delete[] scan_info.clothes;
+        delete[] scan_info.shoes;
+    }
+
+    scan_info.headgear = headgear;
+    scan_info.clothes = clothes;
+    scan_info.shoes = shoes;
+
     items_to_json(headgear, json_data["GearDB"]["HaveGearHeadMap"]);
     items_to_json(clothes, json_data["GearDB"]["HaveGearClothesMap"]);
     items_to_json(shoes, json_data["GearDB"]["HaveGearShoesMap"]);
-
-    delete headgear;
-    delete clothes;
-    delete shoes;
 }

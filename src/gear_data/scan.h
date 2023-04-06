@@ -1,6 +1,9 @@
+#pragma once
+
 #include <cstdlib>
 #include <string>
 #include <nlohmann/json.hpp>
+#include "gear_data/gear.h"
 
 typedef struct {
     int headgear_count;
@@ -9,6 +12,9 @@ typedef struct {
     u_int32_t headgear_address;
     u_int32_t clothes_address;
     u_int32_t shoes_address;
+    GearItem* headgear;
+    GearItem* clothes;
+    GearItem* shoes;
 } ScanInfo;
 
 u_int32_t find(const u_int8_t* data, const std::size_t length, const u_int32_t interval,

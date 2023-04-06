@@ -1,3 +1,5 @@
+#pragma once
+
 #include <array>
 #include <cstdlib>
 
@@ -38,6 +40,34 @@ constexpr int lean_ab_map[27] = {-1, 0,   1,   2,   3,   4,   5,   6,   7,   8, 
 constexpr int to_lean_ab(Ability ab) {
     return lean_ab_map[static_cast<u_int32_t>(ab)];
 }
+
+constexpr char const* ability_internal_name[27] = {"None",
+                                                   "MainInk_Save",
+                                                   "SubInk_Save",
+                                                   "InkRecovery_Up",
+                                                   "HumanMove_Up",
+                                                   "SquidMove_Up",
+                                                   "SpecialIncrease_Up",
+                                                   "RespawnSpecialGauge_Save",
+                                                   "SpecialSpec_Up",
+                                                   "RespawnTime_Save",
+                                                   "JumpTime_Save",
+                                                   "SubSpec_Up",
+                                                   "OpInkEffect_Reduction",
+                                                   "SubEffect_Reduction",
+                                                   "Action_Up",
+                                                   "StartAllUp",
+                                                   "EndAllUp",
+                                                   "MinorityUp",
+                                                   "ComeBack",
+                                                   "SquidMoveSplatter_Reduction",
+                                                   "DeathMarking",
+                                                   "ThermalInk",
+                                                   "Exorcist",
+                                                   "ExSkillDouble",
+                                                   "SuperJumpSign_Hide",
+                                                   "ObjectEffect_Up",
+                                                   "SomersaultLanding"};
 
 constexpr u_int32_t gear_size = 0xB0;
 

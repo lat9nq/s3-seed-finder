@@ -110,5 +110,9 @@ int main(const int argc, char* const* argv) {
         std::printf("%s\n", json_data.dump().c_str());
     }
 
+    delete[] scan_info.headgear;
+    delete[] scan_info.clothes;
+    delete[] scan_info.shoes;
+
     return 0;
 }
