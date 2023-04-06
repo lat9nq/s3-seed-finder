@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <gtk/gtk.h>
 #include <nlohmann/json.hpp>
+#include "gear_data/leanny.h"
 #include "gear_data/scan.h"
 
 class MainWindow {
@@ -59,8 +60,12 @@ private:
     nlohmann::json json_data{};
 
     ScanInfo scan_info{};
+
+    LeannyDB leanny_db{};
 };
 
+extern "C" G_MODULE_EXPORT void on_list_box_gear_row_selected(GtkListBox* self, GtkListBoxRow* row,
+                                                              gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_window_main_destroy(GtkWindow* self, gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_menu_item_quit_activate(GtkMenuItem* self, gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_menu_item_import_binary_dump_activate(GtkMenuItem* self,

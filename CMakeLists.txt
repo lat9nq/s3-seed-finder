@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 project(s3-seed-finder)
 
+set(GAME_VERSION "310")
+
 # Output binaries to bin/
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 

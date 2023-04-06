@@ -96,7 +96,7 @@ int main(const int argc, char* const* argv) {
 
     ScanInfo scan_info{};
 
-    scan_data(file_data.get(), file_size, json_data, search_seed, scan_info);
+    ScanData(file_data.get(), file_size, json_data, search_seed, scan_info);
 
     if (scan_info.headgear_count == 0 && scan_info.clothes_count == 0 &&
         scan_info.shoes_count == 0) {

@@ -12,7 +12,7 @@ constexpr u_int32_t gear_region_delta = 0x2c020;
 
 constexpr u_int32_t no_result = 0xFFFFFFFF;
 
-u_int32_t find(const u_int8_t* data, const std::size_t length, const u_int32_t interval,
+u_int32_t Find(const u_int8_t* data, const std::size_t length, const u_int32_t interval,
                const u_int32_t target) {
     for (u_int32_t i = 0; i < length; i += interval) {
         if (*reinterpret_cast<const u_int32_t*>(data + i) == target) {
@@ -22,8 +22,8 @@ u_int32_t find(const u_int8_t* data, const std::size_t length, const u_int32_t i
     return no_result;
 }
 
-int load_gear_items(GearItem** gear_items, const u_int32_t address, const u_int8_t* data,
-                    const std::size_t length) {
+int LoadGearItems(GearItem** gear_items, const u_int32_t address, const u_int8_t* data,
+                  const std::size_t length) {
     int array_length = 32;
     *gear_items = new GearItem[array_length]();
 
@@ -47,26 +47,25 @@ int load_gear_items(GearItem** gear_items, const u_int32_t address, const u_int8
     return count;
 }
 
-nlohmann::json items_to_json(const GearItem* items, nlohmann::json& json_data) {
+nlohmann::json ItemsToJson(const GearItem* items, nlohmann::json& json_data) {
     for (int i = 0; items[i].id != 0; i++) {
         char id[32];
         std::snprintf(id, 32, "%d", items[i].id);
         const GearItem& item = items[i];
 
-        json_data[id] = {
-            {"ExSkillArray",
-             {to_lean_ab(item.subs[0]), to_lean_ab(item.subs[1]), to_lean_ab(item.subs[2])}},
-            {"ExDrinksArray", nlohmann::json::array()},
-            {"MainSkill", to_lean_ab(item.main)},
-            {"RandomContext", item.seed}};
+        json_data[id] = {{"ExSkillArray",
+                          {ToLeanAb(item.subs[0]), ToLeanAb(item.subs[1]), ToLeanAb(item.subs[2])}},
+                         {"ExDrinksArray", nlohmann::json::array()},
+                         {"MainSkill", ToLeanAb(item.main)},
+                         {"RandomContext", item.seed}};
     }
 
     return json_data;
 }
 
-void scan_data(const u_int8_t* data, const std::size_t length, nlohmann::json& json_data,
-               u_int32_t seed, ScanInfo& scan_info) {
-    const u_int32_t search_result = find(data, length, 0x10, seed);
+void ScanData(const u_int8_t* data, const std::size_t length, nlohmann::json& json_data,
+              u_int32_t seed, ScanInfo& scan_info) {
+    const u_int32_t search_result = Find(data, length, 0x10, seed);
 
     if (search_result == no_result) {
         return;
@@ -82,7 +81,7 @@ void scan_data(const u_int8_t* data, const std::size_t length, nlohmann::json& j
     u_int32_t current = found_item;
     GearItem test;
     std::memcpy(&test, data + found_item, gear_size);
-    if (!validate(test)) {
+    if (!Validate(test)) {
         return;
     }
 
@@ -91,7 +90,7 @@ void scan_data(const u_int8_t* data, const std::size_t length, nlohmann::json& j
         if (current > length) {
             return;
         }
-        if (!validate(test)) {
+        if (!Validate(test)) {
             return;
         }
         std::memcpy(&test, data + current, gear_size);
@@ -106,7 +105,7 @@ void scan_data(const u_int8_t* data, const std::size_t length, nlohmann::json& j
         if (pile > length) {
             return;
         }
-        if (!validate(test)) {
+        if (!Validate(test)) {
             return;
         }
         std::memcpy(&test, data + pile, gear_size);
@@ -120,9 +119,9 @@ void scan_data(const u_int8_t* data, const std::size_t length, nlohmann::json& j
     GearItem* headgear = nullptr;
     GearItem* clothes = nullptr;
     GearItem* shoes = nullptr;
-    scan_info.headgear_count = load_gear_items(&headgear, first_headgear, data, length);
-    scan_info.clothes_count = load_gear_items(&clothes, first_clothes, data, length);
-    scan_info.shoes_count = load_gear_items(&shoes, first_shoes, data, length);
+    scan_info.headgear_count = LoadGearItems(&headgear, first_headgear, data, length);
+    scan_info.clothes_count = LoadGearItems(&clothes, first_clothes, data, length);
+    scan_info.shoes_count = LoadGearItems(&shoes, first_shoes, data, length);
     scan_info.headgear_address = first_headgear - 0x40;
     scan_info.clothes_address = first_clothes - 0x40;
     scan_info.shoes_address = first_shoes - 0x40;
@@ -137,7 +136,7 @@ void scan_data(const u_int8_t* data, const std::size_t length, nlohmann::json& j
     scan_info.clothes = clothes;
     scan_info.shoes = shoes;
 
-    items_to_json(headgear, json_data["GearDB"]["HaveGearHeadMap"]);
-    items_to_json(clothes, json_data["GearDB"]["HaveGearClothesMap"]);
-    items_to_json(shoes, json_data["GearDB"]["HaveGearShoesMap"]);
+    ItemsToJson(headgear, json_data["GearDB"]["HaveGearHeadMap"]);
+    ItemsToJson(clothes, json_data["GearDB"]["HaveGearClothesMap"]);
+    ItemsToJson(shoes, json_data["GearDB"]["HaveGearShoesMap"]);
 }

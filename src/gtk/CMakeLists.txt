@@ -8,7 +8,7 @@ set(GLADE_FILES
     main.glade
 )
 
-set(GLADE_HEADER_GENERATOR ${PROJECT_SOURCE_DIR}/CMakeModules/GenerateHeaderFromGlade.cmake)
+set(GLADE_HEADER_GENERATOR ${PROJECT_SOURCE_DIR}/CMakeModules/GenerateHeaderFromText.cmake)
 set(GLADE_TEMPLATE ${CMAKE_CURRENT_SOURCE_DIR}/glade.h.in)
 
 foreach(GLADE_FILE ${GLADE_FILES})
@@ -35,10 +35,11 @@ DEPENDS
     ${GLADE_HEADERS}
 SOURCES
     ${GLADE_FILES}
+    glade.h.in
 )
 unset(GLADE_HEADERS)
 
-target_link_libraries(s3-seed-finder-gtk INTERFACE glade_headers)
+add_dependencies(s3-seed-finder-gtk glade_headers)
 
 if (NOT WIN32)
     target_link_options(s3-seed-finder-gtk PRIVATE "LINKER:-export-dynamic")
