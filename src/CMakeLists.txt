@@ -33,3 +33,4 @@ add_compile_options(
 
 add_subdirectory(gear_data)
 add_subdirectory(cmd)
+add_subdirectory(gtk)

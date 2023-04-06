@@ -1,0 +1,3 @@
+#pragma once
+
+const char* @VAR_NAME@ = "@GLADE_SOURCE_CONTENT@";
