@@ -8,6 +8,8 @@
 #include "gear_data/leanny.h"
 #include "gear_data/scan.h"
 
+enum class ComboBoxCategorySelections { All, Headgear, Clothes, Shoes };
+
 class MainWindow {
 public:
     explicit MainWindow();
@@ -78,3 +80,5 @@ extern "C" G_MODULE_EXPORT void on_menu_item_custom_binary_dump_activate(GtkMenu
                                                                          gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_button_set_search_seed_clicked(GtkButton* self,
                                                                   gpointer user_data);
+extern "C" G_MODULE_EXPORT void on_combo_box_category_changed(GtkComboBox* self,
+                                                              gpointer user_data);

@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 #include <fstream>
 #include <functional>
 #include <memory>
@@ -80,7 +81,7 @@ void MainWindow::UpdateUi() {
                 const u_int32_t id = gear_list[i].id;
                 const std::string key = leanny_db.GetCode(id, gear_type);
                 const std::string name = leanny_db.LocalizedGearName(key);
-                std::snprintf(buf, 255, "%s", name.c_str());
+                std::strncpy(buf, name.c_str(), 255);
                 GtkWidget* gear_label = gtk_label_new(buf);
                 gtk_widget_set_halign(gear_label, GTK_ALIGN_START);
                 gtk_list_box_insert(list_box_gear, gear_label, -1);
@@ -89,9 +90,24 @@ void MainWindow::UpdateUi() {
                 row_id.push_back(std::make_tuple(id, gear_type, i));
             }
         };
-    populate_list(scan_info.headgear, scan_info.headgear_count, Category::Headgear);
-    populate_list(scan_info.clothes, scan_info.clothes_count, Category::Clothes);
-    populate_list(scan_info.shoes, scan_info.shoes_count, Category::Shoes);
+    const ComboBoxCategorySelections selection =
+        static_cast<ComboBoxCategorySelections>(gtk_combo_box_get_active(combo_box_category));
+    switch (selection) {
+    case ComboBoxCategorySelections::All: {
+        populate_list(scan_info.headgear, scan_info.headgear_count, Category::Headgear);
+        populate_list(scan_info.clothes, scan_info.clothes_count, Category::Clothes);
+        populate_list(scan_info.shoes, scan_info.shoes_count, Category::Shoes);
+    } break;
+    case ComboBoxCategorySelections::Headgear: {
+        populate_list(scan_info.headgear, scan_info.headgear_count, Category::Headgear);
+    } break;
+    case ComboBoxCategorySelections::Clothes: {
+        populate_list(scan_info.clothes, scan_info.clothes_count, Category::Clothes);
+    } break;
+    case ComboBoxCategorySelections::Shoes: {
+        populate_list(scan_info.shoes, scan_info.shoes_count, Category::Shoes);
+    } break;
+    }
 
     char headgear_address[11];
     char clothes_address[11];
@@ -315,6 +331,13 @@ void on_button_set_search_seed_clicked(GtkButton* self, gpointer user_data) {
     assert(self == main_window->button_set_search_seed);
 
     main_window->SetSearchSeed();
+}
+
+void on_combo_box_category_changed(GtkComboBox* self, gpointer user_data) {
+    MainWindow* main_window = static_cast<MainWindow*>(user_data);
+    assert(self == main_window->combo_box_category);
+
+    main_window->UpdateUi();
 }
 
 int main(int argc, char** argv) {
