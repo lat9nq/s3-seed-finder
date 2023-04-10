@@ -30,6 +30,10 @@ std::string LeannyDB::GetCode(u_int32_t id, Category type) {
         return {};
     }
     auto& map = gear_data[static_cast<u_int32_t>(type)];
+    auto& gear_item = map[id];
+    if (gear_item.is_null()) {
+        return std::to_string(id);
+    }
     return map[id]["__RowId"].get<std::string>();
 }
 
@@ -38,6 +42,10 @@ std::string LeannyDB::GetBrand(u_int32_t id, Category type) {
         return {};
     }
     auto& map = gear_data[static_cast<u_int32_t>(type)];
+    auto& gear_item = map[id];
+    if (gear_item.is_null()) {
+        return "???";
+    }
     return map[id]["Brand"].get<std::string>();
 }
 
