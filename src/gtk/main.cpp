@@ -50,6 +50,7 @@ MainWindow::MainWindow() {
     entry_sub_c = GTK_ENTRY(gtk_builder_get_object(builder, "entry_sub_c"));
     entry_seed = GTK_ENTRY(gtk_builder_get_object(builder, "entry_seed"));
     button_set_search_seed = GTK_BUTTON(gtk_builder_get_object(builder, "button_set_search_seed"));
+    button_export = GTK_BUTTON(gtk_builder_get_object(builder, "button_export"));
     entry_offset_headgear = GTK_ENTRY(gtk_builder_get_object(builder, "entry_offset_headgear"));
     entry_offset_clothes = GTK_ENTRY(gtk_builder_get_object(builder, "entry_offset_clothes"));
     entry_offset_shoes = GTK_ENTRY(gtk_builder_get_object(builder, "entry_offset_shoes"));
@@ -57,6 +58,8 @@ MainWindow::MainWindow() {
 
     g_object_ref(window_main);
     g_object_unref(builder);
+
+    UpdateUi();
 }
 
 MainWindow::~MainWindow() {
@@ -68,6 +71,8 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::UpdateUi() {
+    gtk_widget_set_sensitive(GTK_WIDGET(button_export), data_imported);
+
     GtkListBoxRow* current;
     while ((current = gtk_list_box_get_row_at_index(list_box_gear, 0)) != nullptr) {
         gtk_widget_destroy(GTK_WIDGET(current));
@@ -277,7 +282,58 @@ void MainWindow::ImportBinaryDump() {
     const int context_id = gtk_statusbar_get_context_id(statusbar_main, "scan result");
     gtk_statusbar_push(statusbar_main, context_id, message);
 
+    data_imported = true;
+
     UpdateUi();
+}
+
+void MainWindow::Export() {
+    GtkFileFilter* json_filter = gtk_file_filter_new();
+    gtk_file_filter_set_name(json_filter, "JSON files (*.json)");
+    gtk_file_filter_add_mime_type(json_filter, "text/json");
+    gtk_file_filter_add_pattern(json_filter, "*.json");
+
+    GtkFileChooserNative* native = gtk_file_chooser_native_new(
+        "Export Binary Dump", window_main, GTK_FILE_CHOOSER_ACTION_SAVE, "_Export", "_Cancel");
+    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(native), json_filter);
+    gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(native), true);
+
+    const int result = gtk_native_dialog_run(GTK_NATIVE_DIALOG(native));
+    const std::string file_path = [&]() {
+        if (result == GTK_RESPONSE_ACCEPT) {
+            char* filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(native));
+            const std::string native_selection = filename;
+            g_free(filename);
+            return native_selection;
+        }
+        return std::string{};
+    }();
+    g_object_unref(native);
+
+    if (result != GTK_RESPONSE_ACCEPT) {
+        return;
+    }
+
+    std::fstream export_file(file_path, std::ios_base::out | std::ios_base::trunc);
+    if (!export_file.is_open()) {
+        GtkDialog* err_diag = GTK_DIALOG(
+            gtk_dialog_new_with_buttons("Error", window_main, GTK_DIALOG_DESTROY_WITH_PARENT, "_OK",
+                                        GTK_RESPONSE_NONE, nullptr));
+        GtkWidget* content_area = gtk_dialog_get_content_area(err_diag);
+        GtkLabel* err_label = GTK_LABEL(gtk_label_new("Could not open the file for writing"));
+        gtk_container_add(GTK_CONTAINER(content_area), GTK_WIDGET(err_label));
+        gtk_widget_show_all(GTK_WIDGET(err_diag));
+
+        gtk_dialog_run(err_diag);
+
+        gtk_widget_destroy(GTK_WIDGET(err_diag));
+
+        return;
+    }
+
+    export_file << json_data.dump();
+
+    export_file.close();
 }
 
 void on_list_box_gear_row_selected(GtkListBox* self, GtkListBoxRow* row, gpointer user_data) {
@@ -338,6 +394,20 @@ void on_combo_box_category_changed(GtkComboBox* self, gpointer user_data) {
     assert(self == main_window->combo_box_category);
 
     main_window->UpdateUi();
+}
+
+void on_button_export_clicked(GtkButton* self, gpointer user_data) {
+    MainWindow* main_window = static_cast<MainWindow*>(user_data);
+    assert(self == main_window->button_export);
+
+    main_window->Export();
+}
+
+void on_menu_item_export_json_activate(GtkMenuItem* self, gpointer user_data) {
+    MainWindow* main_window = static_cast<MainWindow*>(user_data);
+    assert(self == main_window->menu_item_export_json);
+
+    main_window->Export();
 }
 
 int main(int argc, char** argv) {

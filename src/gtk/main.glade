@@ -197,6 +197,7 @@
                         <property name="can-focus">False</property>
                         <property name="label" translatable="yes">_Export JSON</property>
                         <property name="use-underline">True</property>
+                        <signal name="activate" handler="on_menu_item_export_json_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -875,6 +876,7 @@
             <property name="receives-default">True</property>
             <property name="image">image1</property>
             <property name="always-show-image">True</property>
+            <signal name="clicked" handler="on_button_export_clicked" swapped="no"/>
           </object>
           <packing>
             <property name="position">1</property>

@@ -19,6 +19,7 @@ public:
     void SetSearchSeed();
     void ImportBinaryDump();
     void UpdateGearView(GtkListBoxRow* row);
+    void Export();
 
     GtkWindow* window_main;
     GtkMenuItem* menu_item_import_binary_dump;
@@ -52,6 +53,7 @@ public:
     GtkEntry* entry_sub_c;
     GtkEntry* entry_seed;
     GtkButton* button_set_search_seed;
+    GtkButton* button_export;
     GtkEntry* entry_offset_headgear;
     GtkEntry* entry_offset_clothes;
     GtkEntry* entry_offset_shoes;
@@ -66,6 +68,8 @@ private:
     nlohmann::json json_data{};
     ScanInfo scan_info{};
     LeannyDB leanny_db{};
+
+    bool data_imported{false};
 };
 
 extern "C" G_MODULE_EXPORT void on_list_box_gear_row_selected(GtkListBox* self, GtkListBoxRow* row,
@@ -82,3 +86,6 @@ extern "C" G_MODULE_EXPORT void on_button_set_search_seed_clicked(GtkButton* sel
                                                                   gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_combo_box_category_changed(GtkComboBox* self,
                                                               gpointer user_data);
+extern "C" G_MODULE_EXPORT void on_button_export_clicked(GtkButton* self, gpointer user_data);
+extern "C" G_MODULE_EXPORT void on_menu_item_export_json_activate(GtkMenuItem* self,
+                                                                  gpointer user_data);
