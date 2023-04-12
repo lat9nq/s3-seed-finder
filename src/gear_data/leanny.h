@@ -8,7 +8,7 @@
 
 enum class GearAbility : u_int32_t;
 
-enum class SplatoonLanguage {
+enum class SplLocalization {
     CNzh,
     EUde,
     EUen,
@@ -20,7 +20,7 @@ enum class SplatoonLanguage {
     KRko,
     USen,
     USes,
-    USfr
+    USfr,
 };
 
 enum class Category {
@@ -34,7 +34,7 @@ enum class Category {
 
 class LeannyDB {
 public:
-    explicit LeannyDB();
+    explicit LeannyDB(SplLocalization localization = SplLocalization::USen);
     ~LeannyDB();
 
     std::string GetCode(u_int32_t id, Category gear_type);
@@ -43,7 +43,7 @@ public:
     std::string LocalizedBrand(const std::string& code);
     std::string LocalizedAbility(const std::string& ability);
 
-    void ChangeLanguage(SplatoonLanguage language);
+    void ChangeLocalization(SplLocalization localization);
 
 private:
     static void LoadGear(std::map<u_int32_t, nlohmann::json>& map, const char* json_text);
@@ -51,5 +51,5 @@ private:
 
     std::array<std::map<u_int32_t, nlohmann::json>, 3> gear_data{};
     nlohmann::json localization_json;
-    SplatoonLanguage current_localization{SplatoonLanguage::USen};
+    SplLocalization current_localization;
 };

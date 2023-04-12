@@ -5,10 +5,20 @@
 #include <utility>
 #include <nlohmann/json.hpp>
 #include "gear_data/leanny.h"
+#include "gear_data/leanny/CNzh.json.h"
+#include "gear_data/leanny/EUde.json.h"
+#include "gear_data/leanny/EUen.json.h"
+#include "gear_data/leanny/EUfr.json.h"
+#include "gear_data/leanny/EUnl.json.h"
+#include "gear_data/leanny/EUru.json.h"
 #include "gear_data/leanny/GearInfoClothes.json.h"
 #include "gear_data/leanny/GearInfoHead.json.h"
 #include "gear_data/leanny/GearInfoShoes.json.h"
+#include "gear_data/leanny/JPja.json.h"
+#include "gear_data/leanny/KRko.json.h"
 #include "gear_data/leanny/USen.json.h"
+#include "gear_data/leanny/USes.json.h"
+#include "gear_data/leanny/USfr.json.h"
 
 const char* localization_path[6] = {
     "CommonMsg/Gear/GearName_Head",  "CommonMsg/Gear/GearName_Clothes",
@@ -16,8 +26,16 @@ const char* localization_path[6] = {
     "CommonMsg/Gear/GearPowerName",  "",
 };
 
-LeannyDB::LeannyDB() {
-    localization_json = nlohmann::json::parse(USen_json);
+const std::map<SplLocalization, const char*> localization_json_text = {
+    {SplLocalization::CNzh, CNzh_json}, {SplLocalization::EUde, EUde_json},
+    {SplLocalization::EUfr, EUfr_json}, {SplLocalization::EUnl, EUnl_json},
+    {SplLocalization::EUru, EUru_json}, {SplLocalization::JPja, JPja_json},
+    {SplLocalization::KRko, KRko_json}, {SplLocalization::USen, USen_json},
+    {SplLocalization::USes, USes_json}, {SplLocalization::USfr, USfr_json},
+};
+
+LeannyDB::LeannyDB(SplLocalization localization) : current_localization{localization} {
+    localization_json = nlohmann::json::parse(localization_json_text.at(localization));
 
     LoadGear(gear_data[static_cast<u_int32_t>(Category::Headgear)], GearInfoHead_json);
     LoadGear(gear_data[static_cast<u_int32_t>(Category::Clothes)], GearInfoClothes_json);
@@ -85,7 +103,10 @@ std::string LeannyDB::LocalizedAbility(const std::string& ability) {
     return name.get<std::string>();
 }
 
-void LeannyDB::ChangeLanguage(SplatoonLanguage language) {}
+void LeannyDB::ChangeLocalization(SplLocalization localization) {
+    current_localization = localization;
+    localization_json = nlohmann::json::parse(localization_json_text.at(localization));
+}
 
 void LeannyDB::LoadGear(std::map<u_int32_t, nlohmann::json>& map, const char* json_text) {
     nlohmann::json json_data = nlohmann::json::parse(json_text);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdlib>
+#include <memory>
 #include <utility>
 #include <vector>
 #include <gtk/gtk.h>
@@ -8,11 +9,13 @@
 #include "gear_data/leanny.h"
 #include "gear_data/scan.h"
 
+class Config;
+
 enum class ComboBoxCategorySelections { All, Headgear, Clothes, Shoes };
 
 class MainWindow {
 public:
-    explicit MainWindow();
+    explicit MainWindow(std::unique_ptr<Config> config_);
     ~MainWindow();
 
     void UpdateUi();
@@ -67,7 +70,9 @@ private:
     std::size_t dump_size{0};
     nlohmann::json json_data{};
     ScanInfo scan_info{};
-    LeannyDB leanny_db{};
+
+    std::unique_ptr<Config> config;
+    LeannyDB leanny_db;
 
     bool data_imported{false};
 };

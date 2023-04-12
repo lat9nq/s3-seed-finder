@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdlib>
+#include <set>
 #include <string>
 #include <nlohmann/json.hpp>
 #include "gear_data/gear.h"
@@ -22,6 +23,8 @@ u_int32_t Find(const u_int8_t* data, const std::size_t length, const u_int32_t i
 int LoadGearItems(GearItem** gear_items, const u_int32_t address, const u_int8_t* data,
                   const std::size_t length);
 nlohmann::json ItemsToJson(const GearItem* items, nlohmann::json& json_data);
+void ScanData(const u_int8_t* data, const std::size_t length, nlohmann::json& json_data,
+              const std::set<u_int32_t>& seeds, ScanInfo& scan_info);
 void ScanData(const u_int8_t* data, const std::size_t length, nlohmann::json& json_data,
               u_int32_t seed, ScanInfo& scan_info);
 constexpr bool Validate(GearItem& item);

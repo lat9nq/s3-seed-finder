@@ -8,10 +8,23 @@ add_library(gear_data
 )
 
 set(JSON_FILES
-    leanny/USen.json
     leanny/GearInfoHead.json
     leanny/GearInfoClothes.json
     leanny/GearInfoShoes.json
+)
+
+set(SPL_LOCALIZATIONS
+    CNzh
+    EUde
+    EUen
+    EUfr
+    EUnl
+    EUru
+    JPja
+    KRko
+    USen
+    USes
+    USfr
 )
 
 function(download url target)
@@ -26,7 +39,11 @@ set(LEAN_DB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/leanny")
 cmake_path(RELATIVE_PATH LEAN_DB_PATH BASE_DIRECTORY "${CMAKE_SOURCE_DIR}")
 set(LEAN_DB_PATH "${PROJECT_BINARY_DIR}/${LEAN_DB_PATH}")
 set(LEAN_DB_URL "https://raw.githubusercontent.com/Leanny/leanny.github.io/master/splat3/data")
-download("${LEAN_DB_URL}/language/USen.json" "${LEAN_DB_PATH}/USen.json")
+
+foreach(SPL_LOCALIZATION ${SPL_LOCALIZATIONS})
+    download("${LEAN_DB_URL}/language/${SPL_LOCALIZATION}.json" "${LEAN_DB_PATH}/${SPL_LOCALIZATION}.json")
+    list(APPEND JSON_FILES "leanny/${SPL_LOCALIZATION}.json")
+endforeach()
 download("${LEAN_DB_URL}/mush/${GAME_VERSION}/GearInfoHead.json" "${LEAN_DB_PATH}/GearInfoHead.json")
 download("${LEAN_DB_URL}/mush/${GAME_VERSION}/GearInfoClothes.json" "${LEAN_DB_PATH}/GearInfoClothes.json")
 download("${LEAN_DB_URL}/mush/${GAME_VERSION}/GearInfoShoes.json" "${LEAN_DB_PATH}/GearInfoShoes.json")

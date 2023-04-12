@@ -8,10 +8,12 @@
 #include <sys/stat.h>
 #include "gear_data/leanny.h"
 #include "gear_data/scan.h"
+#include "gtk/config.h"
 #include "gtk/main.glade.h"
 #include "gtk/main.h"
 
-MainWindow::MainWindow() {
+MainWindow::MainWindow(std::unique_ptr<Config> config_)
+    : config{std::move(config_)}, leanny_db{config->localization} {
     GtkBuilder* builder = gtk_builder_new_from_string(main_glade, -1);
     gtk_builder_connect_signals(builder, this);
 
@@ -210,12 +212,12 @@ void MainWindow::SetSearchSeed() {
 }
 
 void MainWindow::ImportBinaryDump() {
-    if (search_seed == 0) {
+    if (search_seed == 0 && config->Seeds().size() == 0) {
         SetSearchSeed();
-    }
-    if (search_seed == 0) {
-        // return if cancelled
-        return;
+        if (search_seed == 0) {
+            // return if cancelled
+            return;
+        }
     }
 
     GtkFileChooserNative* native = gtk_file_chooser_native_new(
@@ -267,7 +269,11 @@ void MainWindow::ImportBinaryDump() {
     dump_stream.read(reinterpret_cast<char*>(dump_data), dump_size);
     dump_stream.close();
 
-    ScanData(dump_data, dump_size, json_data, search_seed, scan_info);
+    if (search_seed != 0) {
+        ScanData(dump_data, dump_size, json_data, search_seed, scan_info);
+    } else {
+        ScanData(dump_data, dump_size, json_data, config->Seeds(), scan_info);
+    }
 
     char message[255];
     const int sum = scan_info.headgear_count + scan_info.clothes_count + scan_info.shoes_count;
@@ -283,6 +289,19 @@ void MainWindow::ImportBinaryDump() {
     gtk_statusbar_push(statusbar_main, context_id, message);
 
     data_imported = true;
+
+    // Register seeds to config
+    std::vector<u_int32_t> seeds;
+    for (int i = 0; i < scan_info.headgear_count; i++) {
+        seeds.push_back(scan_info.headgear[i].seed);
+    }
+    for (int i = 0; i < scan_info.clothes_count; i++) {
+        seeds.push_back(scan_info.clothes[i].seed);
+    }
+    for (int i = 0; i < scan_info.shoes_count; i++) {
+        seeds.push_back(scan_info.shoes[i].seed);
+    }
+    config->LoadSeeds(seeds);
 
     UpdateUi();
 }
@@ -413,7 +432,29 @@ void on_menu_item_export_json_activate(GtkMenuItem* self, gpointer user_data) {
 int main(int argc, char** argv) {
     gtk_init(&argc, &argv);
 
-    std::unique_ptr<MainWindow> main_window = std::make_unique<MainWindow>();
+    // Get default config path
+    const std::filesystem::path config_path = [&]() {
+#ifdef __linux__
+        std::filesystem::path config_path_;
+        const char* xdg_config_home = std::getenv("XDG_CONFIG_HOME");
+        const char* home = std::getenv("HOME");
+
+        if (xdg_config_home == nullptr) {
+            config_path_ = home;
+            config_path_ /= ".config/s3-seed-finder/config.json";
+        } else {
+            config_path_ = xdg_config_home;
+            config_path_ /= "s3-seed-finder/config.json";
+        }
+        return config_path_;
+#else // Generic
+        return "config.json";
+#endif
+    }();
+
+    std::unique_ptr<Config> config = std::make_unique<Config>(config_path);
+
+    std::unique_ptr<MainWindow> main_window = std::make_unique<MainWindow>(std::move(config));
     gtk_widget_show(GTK_WIDGET(main_window->window_main));
 
     gtk_main();

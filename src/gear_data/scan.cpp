@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <set>
 #include <string>
 #include <nlohmann/json.hpp>
 
@@ -61,6 +62,16 @@ nlohmann::json ItemsToJson(const GearItem* items, nlohmann::json& json_data) {
     }
 
     return json_data;
+}
+
+void ScanData(const u_int8_t* data, const std::size_t length, nlohmann::json& json_data,
+              const std::set<u_int32_t>& seeds, ScanInfo& scan_info) {
+    for (u_int32_t seed : seeds) {
+        ScanData(data, length, json_data, seed, scan_info);
+        if (scan_info.headgear_count + scan_info.clothes_count + scan_info.shoes_count > 0) {
+            return;
+        }
+    }
 }
 
 void ScanData(const u_int8_t* data, const std::size_t length, nlohmann::json& json_data,

@@ -2,6 +2,8 @@ add_executable(s3-seed-finder-gtk
     main.cpp
     main.glade
     main.h
+    config.h
+    config.cpp
 )
 
 set(GLADE_FILES
