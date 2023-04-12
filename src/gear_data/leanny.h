@@ -47,7 +47,7 @@ public:
 
 private:
     static void LoadGear(std::map<u_int32_t, nlohmann::json>& map, const char* json_text);
-    std::tuple<Category, std::string> GetShortCode(const std::string& code);
+    std::tuple<Category, std::string> GetShortCode(const std::string& code) const;
 
     std::array<std::map<u_int32_t, nlohmann::json>, 3> gear_data{};
     nlohmann::json localization_json;

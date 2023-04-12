@@ -28,10 +28,11 @@ const char* localization_path[6] = {
 
 const std::map<SplLocalization, const char*> localization_json_text = {
     {SplLocalization::CNzh, CNzh_json}, {SplLocalization::EUde, EUde_json},
-    {SplLocalization::EUfr, EUfr_json}, {SplLocalization::EUnl, EUnl_json},
-    {SplLocalization::EUru, EUru_json}, {SplLocalization::JPja, JPja_json},
-    {SplLocalization::KRko, KRko_json}, {SplLocalization::USen, USen_json},
-    {SplLocalization::USes, USes_json}, {SplLocalization::USfr, USfr_json},
+    {SplLocalization::EUen, EUen_json}, {SplLocalization::EUfr, EUfr_json},
+    {SplLocalization::EUnl, EUnl_json}, {SplLocalization::EUru, EUru_json},
+    {SplLocalization::JPja, JPja_json}, {SplLocalization::KRko, KRko_json},
+    {SplLocalization::USen, USen_json}, {SplLocalization::USes, USes_json},
+    {SplLocalization::USfr, USfr_json},
 };
 
 LeannyDB::LeannyDB(SplLocalization localization) : current_localization{localization} {
@@ -117,7 +118,7 @@ void LeannyDB::LoadGear(std::map<u_int32_t, nlohmann::json>& map, const char* js
     }
 }
 
-std::tuple<Category, std::string> LeannyDB::GetShortCode(const std::string& code) {
+std::tuple<Category, std::string> LeannyDB::GetShortCode(const std::string& code) const {
     const Category gear_type = [&]() {
         if (code.find("Hed_") == 0) {
             return Category::Headgear;
