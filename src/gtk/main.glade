@@ -37,102 +37,137 @@
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <child>
-      <object class="GtkRadioMenuItem">
+      <object class="GtkRadioMenuItem" id="radio_menu_item_cnzh">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">CNzh</property>
         <property name="use-underline">True</property>
         <property name="draw-as-radio">True</property>
+        <signal name="toggled" handler="on_radio_menu_item_localization_toggled" swapped="no"/>
       </object>
     </child>
     <child>
-      <object class="GtkRadioMenuItem">
+      <object class="GtkRadioMenuItem" id="radio_menu_item_eude">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">EUde</property>
         <property name="use-underline">True</property>
         <property name="draw-as-radio">True</property>
+        <property name="group">radio_menu_item_cnzh</property>
+        <signal name="toggled" handler="on_radio_menu_item_localization_toggled" swapped="no"/>
       </object>
     </child>
     <child>
-      <object class="GtkRadioMenuItem">
+      <object class="GtkRadioMenuItem" id="radio_menu_item_euen">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">EUen</property>
         <property name="use-underline">True</property>
         <property name="draw-as-radio">True</property>
+        <property name="group">radio_menu_item_eude</property>
+        <signal name="toggled" handler="on_radio_menu_item_localization_toggled" swapped="no"/>
       </object>
     </child>
     <child>
-      <object class="GtkRadioMenuItem">
+      <object class="GtkRadioMenuItem" id="radio_menu_item_eufr">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">EUfr</property>
         <property name="use-underline">True</property>
         <property name="draw-as-radio">True</property>
+        <property name="group">radio_menu_item_euen</property>
+        <signal name="toggled" handler="on_radio_menu_item_localization_toggled" swapped="no"/>
       </object>
     </child>
     <child>
-      <object class="GtkRadioMenuItem">
+      <object class="GtkRadioMenuItem" id="radio_menu_item_eunl">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">EUnl</property>
         <property name="use-underline">True</property>
         <property name="draw-as-radio">True</property>
+        <property name="group">radio_menu_item_eufr</property>
+        <signal name="toggled" handler="on_radio_menu_item_localization_toggled" swapped="no"/>
       </object>
     </child>
     <child>
-      <object class="GtkRadioMenuItem">
+      <object class="GtkRadioMenuItem" id="radio_menu_item_euru">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">EUru</property>
         <property name="use-underline">True</property>
         <property name="draw-as-radio">True</property>
+        <property name="group">radio_menu_item_eunl</property>
+        <signal name="toggled" handler="on_radio_menu_item_localization_toggled" swapped="no"/>
       </object>
     </child>
     <child>
-      <object class="GtkRadioMenuItem">
+      <object class="GtkRadioMenuItem" id="radio_menu_item_jpja">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">JPja</property>
         <property name="use-underline">True</property>
         <property name="draw-as-radio">True</property>
+        <property name="group">radio_menu_item_euru</property>
+        <signal name="toggled" handler="on_radio_menu_item_localization_toggled" swapped="no"/>
       </object>
     </child>
     <child>
-      <object class="GtkRadioMenuItem">
+      <object class="GtkRadioMenuItem" id="radio_menu_item_krko">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">KRko</property>
         <property name="use-underline">True</property>
         <property name="draw-as-radio">True</property>
+        <property name="group">radio_menu_item_jpja</property>
+        <signal name="toggled" handler="on_radio_menu_item_localization_toggled" swapped="no"/>
       </object>
     </child>
     <child>
-      <object class="GtkRadioMenuItem">
+      <object class="GtkRadioMenuItem" id="radio_menu_item_usen">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">USen</property>
         <property name="use-underline">True</property>
         <property name="draw-as-radio">True</property>
+        <property name="group">radio_menu_item_krko</property>
+        <signal name="toggled" handler="on_radio_menu_item_localization_toggled" swapped="no"/>
       </object>
     </child>
     <child>
-      <object class="GtkRadioMenuItem">
+      <object class="GtkRadioMenuItem" id="radio_menu_item_uses">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">USes</property>
         <property name="use-underline">True</property>
         <property name="draw-as-radio">True</property>
+        <property name="group">radio_menu_item_usen</property>
+        <signal name="toggled" handler="on_radio_menu_item_localization_toggled" swapped="no"/>
       </object>
     </child>
     <child>
-      <object class="GtkRadioMenuItem">
+      <object class="GtkRadioMenuItem" id="radio_menu_item_usfr">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">USfr</property>
         <property name="use-underline">True</property>
         <property name="draw-as-radio">True</property>
+        <property name="group">radio_menu_item_uses</property>
+        <signal name="toggled" handler="on_radio_menu_item_localization_toggled" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="menu_item_about">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">About</property>
+        <property name="use-underline">True</property>
       </object>
     </child>
   </object>
@@ -147,246 +182,6 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
-        <child>
-          <object class="GtkMenuBar">
-            <property name="can-focus">False</property>
-            <child>
-              <object class="GtkMenuItem">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">_File</property>
-                <property name="use-underline">True</property>
-                <child type="submenu">
-                  <object class="GtkMenu">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <child>
-                      <object class="GtkMenuItem">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Impo_rt</property>
-                        <property name="use-underline">True</property>
-                        <child type="submenu">
-                          <object class="GtkMenu">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <child>
-                              <object class="GtkMenuItem" id="menu_item_import_binary_dump">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Bina_ry Dump...</property>
-                                <property name="use-underline">True</property>
-                                <signal name="activate" handler="on_menu_item_import_binary_dump_activate" swapped="no"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="menu_item_import_database_backup">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Le_an Gear Database Backup</property>
-                                <property name="use-underline">True</property>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="menu_item_export_json">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">_Export JSON</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_menu_item_export_json_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="menu_item_quit">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">_Quit</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_menu_item_quit_activate" swapped="no"/>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">_Settings</property>
-                <property name="use-underline">True</property>
-                <child type="submenu">
-                  <object class="GtkMenu">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <child>
-                      <object class="GtkMenuItem" id="menu_item_set_seed">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Set Kno_wn Seed...</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_menu_item_set_seed_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Loc_alization</property>
-                        <property name="use-underline">True</property>
-                        <child type="submenu">
-                          <object class="GtkMenu">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_cnzh">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">CNzh</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_eude">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">EUde</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_euen">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">EUen</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_eufr">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">EUfr</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_euit">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">EUit</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_eunl">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">EUnl</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_euru">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">EUru</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_jpja">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">JPja</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_krko">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">KRko</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_usen">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">USen</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_uses">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">USes</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckMenuItem" id="menu_item_usfr">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">USfr</property>
-                                <property name="use-underline">True</property>
-                                <property name="draw-as-radio">True</property>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">_Help</property>
-                <property name="use-underline">True</property>
-                <child type="submenu">
-                  <object class="GtkMenu">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <child>
-                      <object class="GtkMenuItem" id="menu_item_about">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">_About</property>
-                        <property name="use-underline">True</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
@@ -801,7 +596,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="position">0</property>
           </packing>
         </child>
         <child>
@@ -814,7 +609,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">2</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>

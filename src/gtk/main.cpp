@@ -3,6 +3,7 @@
 #include <cstring>
 #include <fstream>
 #include <functional>
+#include <map>
 #include <memory>
 #include <gtk/gtk.h>
 #include <sys/stat.h>
@@ -18,25 +19,30 @@ MainWindow::MainWindow(std::unique_ptr<Config> config_)
     gtk_builder_connect_signals(builder, this);
 
     window_main = GTK_WINDOW(gtk_builder_get_object(builder, "window_main"));
-    menu_item_import_binary_dump =
-        GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_import_binary_dump"));
-    menu_item_import_database_backup =
-        GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_import_database_backup"));
-    menu_item_export_json = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_export_json"));
-    menu_item_quit = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_quit"));
-    menu_item_set_seed = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_set_seed"));
-    menu_item_cnzh = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_cnzh"));
-    menu_item_eude = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_eude"));
-    menu_item_euen = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_euen"));
-    menu_item_eufr = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_eufr"));
-    menu_item_euit = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_euit"));
-    menu_item_eunl = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_eunl"));
-    menu_item_euru = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_euru"));
-    menu_item_jpja = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_jpja"));
-    menu_item_krko = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_krko"));
-    menu_item_usen = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_usen"));
-    menu_item_uses = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_uses"));
-    menu_item_usfr = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_usfr"));
+    radio_menu_item_cnzh =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_cnzh"));
+    radio_menu_item_eude =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_eude"));
+    radio_menu_item_euen =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_euen"));
+    radio_menu_item_eufr =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_eufr"));
+    radio_menu_item_euit =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_euit"));
+    radio_menu_item_eunl =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_eunl"));
+    radio_menu_item_euru =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_euru"));
+    radio_menu_item_jpja =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_jpja"));
+    radio_menu_item_krko =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_krko"));
+    radio_menu_item_usen =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_usen"));
+    radio_menu_item_uses =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_uses"));
+    radio_menu_item_usfr =
+        GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_usfr"));
     menu_item_custom_binary_dump =
         GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_custom_binary_dump"));
     menu_item_about = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_about"));
@@ -57,6 +63,26 @@ MainWindow::MainWindow(std::unique_ptr<Config> config_)
     entry_offset_clothes = GTK_ENTRY(gtk_builder_get_object(builder, "entry_offset_clothes"));
     entry_offset_shoes = GTK_ENTRY(gtk_builder_get_object(builder, "entry_offset_shoes"));
     statusbar_main = GTK_STATUSBAR(gtk_builder_get_object(builder, "statusbar_main"));
+
+    menu_localization[radio_menu_item_cnzh] = SplLocalization::CNzh;
+    menu_localization[radio_menu_item_eude] = SplLocalization::EUde;
+    menu_localization[radio_menu_item_euen] = SplLocalization::EUen;
+    menu_localization[radio_menu_item_eufr] = SplLocalization::EUfr;
+    menu_localization[radio_menu_item_euit] = SplLocalization::EUit;
+    menu_localization[radio_menu_item_eunl] = SplLocalization::EUnl;
+    menu_localization[radio_menu_item_euru] = SplLocalization::EUru;
+    menu_localization[radio_menu_item_jpja] = SplLocalization::JPja;
+    menu_localization[radio_menu_item_krko] = SplLocalization::KRko;
+    menu_localization[radio_menu_item_usen] = SplLocalization::USen;
+    menu_localization[radio_menu_item_uses] = SplLocalization::USes;
+    menu_localization[radio_menu_item_usfr] = SplLocalization::USfr;
+
+    for (auto& x : menu_localization) {
+        if (x.second == config->localization) {
+            gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(x.first), true);
+            return;
+        }
+    }
 
     g_object_ref(window_main);
     g_object_unref(builder);
@@ -212,6 +238,7 @@ void MainWindow::SetSearchSeed() {
 }
 
 void MainWindow::ImportBinaryDump() {
+    // Prompt for a search seed if there is no seed currently available
     if (search_seed == 0 && config->Seeds().size() == 0) {
         SetSearchSeed();
         if (search_seed == 0) {
@@ -355,6 +382,24 @@ void MainWindow::Export() {
     export_file.close();
 }
 
+void MainWindow::ChangeLocalization(SplLocalization localization) {
+    config->localization = localization;
+    leanny_db.ChangeLocalization(localization);
+
+    GtkListBoxRow* selected_row = gtk_list_box_get_selected_row(list_box_gear);
+    if (selected_row == nullptr) {
+        UpdateUi();
+        return;
+    }
+
+    const int index = gtk_list_box_row_get_index(selected_row);
+
+    UpdateUi();
+
+    selected_row = gtk_list_box_get_row_at_index(list_box_gear, index);
+    gtk_list_box_select_row(list_box_gear, selected_row);
+}
+
 void on_list_box_gear_row_selected(GtkListBox* self, GtkListBoxRow* row, gpointer user_data) {
     MainWindow* main_window = static_cast<MainWindow*>(user_data);
     assert(self == main_window->list_box_gear);
@@ -373,32 +418,11 @@ void on_window_main_destroy(GtkWindow* self, gpointer user_data) {
     gtk_main_quit();
 }
 
-void on_menu_item_quit_activate(GtkMenuItem* self, gpointer user_data) {
-    MainWindow* main_window = static_cast<MainWindow*>(user_data);
-    assert(self == main_window->menu_item_quit);
-
-    gtk_main_quit();
-}
-
-void on_menu_item_import_binary_dump_activate(GtkMenuItem* self, gpointer user_data) {
-    MainWindow* main_window = static_cast<MainWindow*>(user_data);
-    assert(self == main_window->menu_item_import_binary_dump);
-
-    main_window->ImportBinaryDump();
-}
-
 void on_menu_item_custom_binary_dump_activate(GtkMenuItem* self, gpointer user_data) {
     MainWindow* main_window = static_cast<MainWindow*>(user_data);
     assert(self == main_window->menu_item_custom_binary_dump);
 
     main_window->ImportBinaryDump();
-}
-
-void on_menu_item_set_seed_activate(GtkMenuItem* self, gpointer user_data) {
-    MainWindow* main_window = static_cast<MainWindow*>(user_data);
-    assert(self == main_window->menu_item_set_seed);
-
-    main_window->SetSearchSeed();
 }
 
 void on_button_set_search_seed_clicked(GtkButton* self, gpointer user_data) {
@@ -422,11 +446,15 @@ void on_button_export_clicked(GtkButton* self, gpointer user_data) {
     main_window->Export();
 }
 
-void on_menu_item_export_json_activate(GtkMenuItem* self, gpointer user_data) {
-    MainWindow* main_window = static_cast<MainWindow*>(user_data);
-    assert(self == main_window->menu_item_export_json);
+void on_radio_menu_item_localization_toggled(GtkRadioMenuItem* self, gpointer user_data) {
+    if (!gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(self))) {
+        return;
+    }
 
-    main_window->Export();
+    MainWindow* main_window = static_cast<MainWindow*>(user_data);
+    const SplLocalization selected = main_window->menu_localization.at(self);
+
+    main_window->ChangeLocalization(selected);
 }
 
 int main(int argc, char** argv) {

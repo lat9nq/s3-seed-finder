@@ -24,24 +24,21 @@ public:
     void UpdateGearView(GtkListBoxRow* row);
     void Export();
 
+    void ChangeLocalization(SplLocalization localization);
+
     GtkWindow* window_main;
-    GtkMenuItem* menu_item_import_binary_dump;
-    GtkMenuItem* menu_item_import_database_backup;
-    GtkMenuItem* menu_item_export_json;
-    GtkMenuItem* menu_item_quit;
-    GtkMenuItem* menu_item_set_seed;
-    GtkMenuItem* menu_item_cnzh;
-    GtkMenuItem* menu_item_eude;
-    GtkMenuItem* menu_item_euen;
-    GtkMenuItem* menu_item_eufr;
-    GtkMenuItem* menu_item_euit;
-    GtkMenuItem* menu_item_eunl;
-    GtkMenuItem* menu_item_euru;
-    GtkMenuItem* menu_item_jpja;
-    GtkMenuItem* menu_item_krko;
-    GtkMenuItem* menu_item_usen;
-    GtkMenuItem* menu_item_uses;
-    GtkMenuItem* menu_item_usfr;
+    GtkRadioMenuItem* radio_menu_item_cnzh;
+    GtkRadioMenuItem* radio_menu_item_eude;
+    GtkRadioMenuItem* radio_menu_item_euen;
+    GtkRadioMenuItem* radio_menu_item_eufr;
+    GtkRadioMenuItem* radio_menu_item_euit;
+    GtkRadioMenuItem* radio_menu_item_eunl;
+    GtkRadioMenuItem* radio_menu_item_euru;
+    GtkRadioMenuItem* radio_menu_item_jpja;
+    GtkRadioMenuItem* radio_menu_item_krko;
+    GtkRadioMenuItem* radio_menu_item_usen;
+    GtkRadioMenuItem* radio_menu_item_uses;
+    GtkRadioMenuItem* radio_menu_item_usfr;
     GtkMenuItem* menu_item_about;
     GtkMenuItem* menu_item_custom_binary_dump;
     GtkComboBox* combo_box_category;
@@ -62,6 +59,8 @@ public:
     GtkEntry* entry_offset_shoes;
     GtkStatusbar* statusbar_main;
 
+    std::map<GtkRadioMenuItem*, SplLocalization> menu_localization;
+
 private:
     u_int32_t search_seed{0};
     std::vector<std::tuple<u_int32_t, Category, u_int32_t>> row_id;
@@ -80,11 +79,6 @@ private:
 extern "C" G_MODULE_EXPORT void on_list_box_gear_row_selected(GtkListBox* self, GtkListBoxRow* row,
                                                               gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_window_main_destroy(GtkWindow* self, gpointer user_data);
-extern "C" G_MODULE_EXPORT void on_menu_item_quit_activate(GtkMenuItem* self, gpointer user_data);
-extern "C" G_MODULE_EXPORT void on_menu_item_import_binary_dump_activate(GtkMenuItem* self,
-                                                                         gpointer user_data);
-extern "C" G_MODULE_EXPORT void on_menu_item_set_seed_activate(GtkMenuItem* self,
-                                                               gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_menu_item_custom_binary_dump_activate(GtkMenuItem* self,
                                                                          gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_button_set_search_seed_clicked(GtkButton* self,
@@ -94,3 +88,5 @@ extern "C" G_MODULE_EXPORT void on_combo_box_category_changed(GtkComboBox* self,
 extern "C" G_MODULE_EXPORT void on_button_export_clicked(GtkButton* self, gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_menu_item_export_json_activate(GtkMenuItem* self,
                                                                   gpointer user_data);
+extern "C" G_MODULE_EXPORT void on_radio_menu_item_localization_toggled(GtkRadioMenuItem* self,
+                                                                        gpointer user_data);
