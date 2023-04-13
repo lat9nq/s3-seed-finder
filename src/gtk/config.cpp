@@ -16,6 +16,8 @@
 const char* json_localization_key = "localization";
 const char* json_seeds_key = "seeds";
 const char* json_last_open_key = "last_open_file";
+const char* json_last_backup_key = "last_imported_backup";
+const char* json_last_export_key = "last_exported";
 const SplLocalization localization_default = SplLocalization::USen;
 
 Config::Config(const std::filesystem::path& path) : config_path{path} {
@@ -47,6 +49,16 @@ Config::Config(const std::filesystem::path& path) : config_path{path} {
     if (json_last_open.is_string()) {
         last_open_file = json_last_open.get<std::string>();
     }
+
+    const auto& json_last_backup = config_json[json_last_backup_key];
+    if (json_last_backup.is_string()) {
+        last_backup = json_last_backup.get<std::string>();
+    }
+
+    const auto& json_last_export = config_json[json_last_export_key];
+    if (json_last_export.is_string()) {
+        last_export = json_last_export.get<std::string>();
+    }
 }
 
 Config::~Config() {
@@ -55,6 +67,8 @@ Config::~Config() {
     json_data[json_localization_key] = localization;
     json_data[json_seeds_key] = seeds;
     json_data[json_last_open_key] = last_open_file;
+    json_data[json_last_backup_key] = last_backup;
+    json_data[json_last_export_key] = last_export;
     const std::string json_text = json_data.dump();
 
     // Make sure the config base directory exists

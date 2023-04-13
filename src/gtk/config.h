@@ -16,6 +16,8 @@ public:
 
     SplLocalization localization;
     std::filesystem::path last_open_file;
+    std::filesystem::path last_backup;
+    std::filesystem::path last_export;
 
 private:
     const std::filesystem::path config_path;

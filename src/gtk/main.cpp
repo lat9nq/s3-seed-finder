@@ -45,6 +45,8 @@ MainWindow::MainWindow(std::unique_ptr<Config> config_)
         GTK_RADIO_MENU_ITEM(gtk_builder_get_object(builder, "radio_menu_item_usfr"));
     menu_item_custom_binary_dump =
         GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_custom_binary_dump"));
+    menu_item_custom_import_database_backup =
+        GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_custom_import_database_backup"));
     menu_item_about = GTK_MENU_ITEM(gtk_builder_get_object(builder, "menu_item_about"));
     combo_box_category = GTK_COMBO_BOX(gtk_builder_get_object(builder, "combo_box_category"));
     list_box_gear = GTK_LIST_BOX(gtk_builder_get_object(builder, "list_box_gear"));
@@ -338,6 +340,75 @@ void MainWindow::ImportBinaryDump() {
     UpdateUi();
 }
 
+void MainWindow::ImportDatabaseBackup() {
+    GtkFileFilter* json_filter = gtk_file_filter_new();
+    gtk_file_filter_set_name(json_filter, "JSON files (*.json)");
+    gtk_file_filter_add_mime_type(json_filter, "text/json");
+    gtk_file_filter_add_pattern(json_filter, "*.json");
+
+    GtkFileChooserNative* native =
+        gtk_file_chooser_native_new("Import Lean Database Backup", window_main,
+                                    GTK_FILE_CHOOSER_ACTION_OPEN, "_Import", "_Cancel");
+    if (!config->last_backup.empty()) {
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(native), config->last_backup.c_str());
+    }
+    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(native), json_filter);
+
+    const int result = gtk_native_dialog_run(GTK_NATIVE_DIALOG(native));
+    const std::filesystem::path file_path = [&]() {
+        if (result == GTK_RESPONSE_ACCEPT) {
+            char* filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(native));
+            const std::filesystem::path native_selection = filename;
+            g_free(filename);
+            return native_selection;
+        }
+        return std::filesystem::path{};
+    }();
+    g_object_unref(native);
+
+    if (result != GTK_RESPONSE_ACCEPT) {
+        return;
+    }
+
+    std::fstream backup_stream(file_path, std::ios_base::in);
+    if (!backup_stream.is_open()) {
+        GtkDialog* err_diag = GTK_DIALOG(
+            gtk_dialog_new_with_buttons("Error", window_main, GTK_DIALOG_DESTROY_WITH_PARENT, "_OK",
+                                        GTK_RESPONSE_NONE, nullptr));
+        GtkWidget* content_area = gtk_dialog_get_content_area(err_diag);
+        GtkLabel* err_label = GTK_LABEL(gtk_label_new("Could not open the file"));
+        gtk_container_add(GTK_CONTAINER(content_area), GTK_WIDGET(err_label));
+        gtk_widget_show_all(GTK_WIDGET(err_diag));
+
+        gtk_dialog_run(err_diag);
+
+        gtk_widget_destroy(GTK_WIDGET(err_diag));
+
+        return;
+    }
+
+    nlohmann::json backup_data = nlohmann::json::parse(backup_stream);
+    backup_stream.close();
+
+    int count{0};
+    for (auto& [key, value] : backup_data.items()) {
+        if (key == "GearDB") {
+            continue;
+        }
+        json_data[key] = backup_data[key];
+        count++;
+    }
+
+    config->last_backup = file_path;
+
+    std::stringstream message;
+    message << "Imported database backup " << file_path.filename() << " (" << count
+            << " fields entered)";
+
+    const int context_id = gtk_statusbar_get_context_id(statusbar_main, "export result");
+    gtk_statusbar_push(statusbar_main, context_id, message.str().c_str());
+}
+
 void MainWindow::Export() {
     GtkFileFilter* json_filter = gtk_file_filter_new();
     gtk_file_filter_set_name(json_filter, "JSON files (*.json)");
@@ -348,16 +419,19 @@ void MainWindow::Export() {
         "Export Binary Dump", window_main, GTK_FILE_CHOOSER_ACTION_SAVE, "_Export", "_Cancel");
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(native), json_filter);
     gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(native), true);
+    if (!config->last_export.empty()) {
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(native), config->last_export.c_str());
+    }
 
     const int result = gtk_native_dialog_run(GTK_NATIVE_DIALOG(native));
-    const std::string file_path = [&]() {
+    const std::filesystem::path file_path = [&]() {
         if (result == GTK_RESPONSE_ACCEPT) {
             char* filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(native));
-            const std::string native_selection = filename;
+            const std::filesystem::path native_selection = filename;
             g_free(filename);
             return native_selection;
         }
-        return std::string{};
+        return std::filesystem::path{};
     }();
     g_object_unref(native);
 
@@ -385,6 +459,14 @@ void MainWindow::Export() {
     export_file << json_data.dump();
 
     export_file.close();
+
+    config->last_export = file_path;
+
+    std::stringstream message_stream;
+    message_stream << "Exported " << file_path.filename();
+
+    const int context_id = gtk_statusbar_get_context_id(statusbar_main, "export result");
+    gtk_statusbar_push(statusbar_main, context_id, message_stream.str().c_str());
 }
 
 void MainWindow::ChangeLocalization(SplLocalization localization) {
@@ -428,6 +510,13 @@ void on_menu_item_custom_binary_dump_activate(GtkMenuItem* self, gpointer user_d
     assert(self == main_window->menu_item_custom_binary_dump);
 
     main_window->ImportBinaryDump();
+}
+
+void on_menu_item_custom_import_database_backup_activate(GtkMenuItem* self, gpointer user_data) {
+    MainWindow* main_window = static_cast<MainWindow*>(user_data);
+    assert(self == main_window->menu_item_custom_import_database_backup);
+
+    main_window->ImportDatabaseBackup();
 }
 
 void on_button_set_search_seed_clicked(GtkButton* self, gpointer user_data) {

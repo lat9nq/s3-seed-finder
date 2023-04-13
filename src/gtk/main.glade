@@ -25,11 +25,12 @@
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem">
+      <object class="GtkMenuItem" id="menu_item_custom_import_database_backup">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Import Lean Gear Database Backup</property>
         <property name="use-underline">True</property>
+        <signal name="activate" handler="on_menu_item_custom_import_database_backup_activate" swapped="no"/>
       </object>
     </child>
   </object>

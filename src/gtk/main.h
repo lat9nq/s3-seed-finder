@@ -21,6 +21,7 @@ public:
     void UpdateUi();
     void SetSearchSeed();
     void ImportBinaryDump();
+    void ImportDatabaseBackup();
     void UpdateGearView(GtkListBoxRow* row);
     void Export();
 
@@ -41,6 +42,7 @@ public:
     GtkRadioMenuItem* radio_menu_item_usfr;
     GtkMenuItem* menu_item_about;
     GtkMenuItem* menu_item_custom_binary_dump;
+    GtkMenuItem* menu_item_custom_import_database_backup;
     GtkComboBox* combo_box_category;
     GtkListBox* list_box_gear;
     GtkEntry* entry_name;
@@ -76,17 +78,19 @@ private:
     bool data_imported{false};
 };
 
-extern "C" G_MODULE_EXPORT void on_list_box_gear_row_selected(GtkListBox* self, GtkListBoxRow* row,
-                                                              gpointer user_data);
-extern "C" G_MODULE_EXPORT void on_window_main_destroy(GtkWindow* self, gpointer user_data);
-extern "C" G_MODULE_EXPORT void on_menu_item_custom_binary_dump_activate(GtkMenuItem* self,
-                                                                         gpointer user_data);
+extern "C" G_MODULE_EXPORT void on_button_export_clicked(GtkButton* self, gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_button_set_search_seed_clicked(GtkButton* self,
                                                                   gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_combo_box_category_changed(GtkComboBox* self,
                                                               gpointer user_data);
-extern "C" G_MODULE_EXPORT void on_button_export_clicked(GtkButton* self, gpointer user_data);
+extern "C" G_MODULE_EXPORT void on_list_box_gear_row_selected(GtkListBox* self, GtkListBoxRow* row,
+                                                              gpointer user_data);
+extern "C" G_MODULE_EXPORT void on_menu_item_custom_binary_dump_activate(GtkMenuItem* self,
+                                                                         gpointer user_data);
+extern "C" G_MODULE_EXPORT void on_menu_item_custom_import_database_backup_activate(
+    GtkMenuItem* self, gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_menu_item_export_json_activate(GtkMenuItem* self,
                                                                   gpointer user_data);
 extern "C" G_MODULE_EXPORT void on_radio_menu_item_localization_toggled(GtkRadioMenuItem* self,
                                                                         gpointer user_data);
+extern "C" G_MODULE_EXPORT void on_window_main_destroy(GtkWindow* self, gpointer user_data);
