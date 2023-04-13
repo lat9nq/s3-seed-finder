@@ -49,6 +49,7 @@ int LoadGearItems(GearItem** gear_items, const u_int32_t address, const u_int8_t
 }
 
 nlohmann::json ItemsToJson(const GearItem* items, nlohmann::json& json_data) {
+    json_data.clear();
     for (int i = 0; items[i].id != 0; i++) {
         char id[32];
         std::snprintf(id, 32, "%d", items[i].id);
@@ -76,6 +77,19 @@ void ScanData(const u_int8_t* data, const std::size_t length, nlohmann::json& js
 
 void ScanData(const u_int8_t* data, const std::size_t length, nlohmann::json& json_data,
               u_int32_t seed, ScanInfo& scan_info) {
+    if (scan_info.headgear != nullptr) {
+        delete[] scan_info.headgear;
+        delete[] scan_info.clothes;
+        delete[] scan_info.shoes;
+
+        scan_info.headgear = nullptr;
+        scan_info.clothes = nullptr;
+        scan_info.shoes = nullptr;
+    }
+    scan_info.headgear_count = 0;
+    scan_info.clothes_count = 0;
+    scan_info.shoes_count = 0;
+
     const u_int32_t search_result = Find(data, length, 0x10, seed);
 
     if (search_result == no_result) {
@@ -127,27 +141,14 @@ void ScanData(const u_int8_t* data, const std::size_t length, nlohmann::json& js
     const u_int32_t first_clothes = first_headgear + gear_region_delta;
     const u_int32_t first_shoes = first_clothes + gear_region_delta;
 
-    GearItem* headgear = nullptr;
-    GearItem* clothes = nullptr;
-    GearItem* shoes = nullptr;
-    scan_info.headgear_count = LoadGearItems(&headgear, first_headgear, data, length);
-    scan_info.clothes_count = LoadGearItems(&clothes, first_clothes, data, length);
-    scan_info.shoes_count = LoadGearItems(&shoes, first_shoes, data, length);
+    scan_info.headgear_count = LoadGearItems(&scan_info.headgear, first_headgear, data, length);
+    scan_info.clothes_count = LoadGearItems(&scan_info.clothes, first_clothes, data, length);
+    scan_info.shoes_count = LoadGearItems(&scan_info.shoes, first_shoes, data, length);
     scan_info.headgear_address = first_headgear - 0x40;
     scan_info.clothes_address = first_clothes - 0x40;
     scan_info.shoes_address = first_shoes - 0x40;
 
-    if (scan_info.headgear != nullptr) {
-        delete[] scan_info.headgear;
-        delete[] scan_info.clothes;
-        delete[] scan_info.shoes;
-    }
-
-    scan_info.headgear = headgear;
-    scan_info.clothes = clothes;
-    scan_info.shoes = shoes;
-
-    ItemsToJson(headgear, json_data["GearDB"]["HaveGearHeadMap"]);
-    ItemsToJson(clothes, json_data["GearDB"]["HaveGearClothesMap"]);
-    ItemsToJson(shoes, json_data["GearDB"]["HaveGearShoesMap"]);
+    ItemsToJson(scan_info.headgear, json_data["GearDB"]["HaveGearHeadMap"]);
+    ItemsToJson(scan_info.clothes, json_data["GearDB"]["HaveGearClothesMap"]);
+    ItemsToJson(scan_info.shoes, json_data["GearDB"]["HaveGearShoesMap"]);
 }
