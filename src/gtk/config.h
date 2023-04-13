@@ -15,6 +15,7 @@ public:
     const std::set<u_int32_t>& Seeds() const;
 
     SplLocalization localization;
+    std::filesystem::path last_open_file;
 
 private:
     const std::filesystem::path config_path;

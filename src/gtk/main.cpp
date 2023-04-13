@@ -249,6 +249,9 @@ void MainWindow::ImportBinaryDump() {
 
     GtkFileChooserNative* native = gtk_file_chooser_native_new(
         "Import Binary Dump", window_main, GTK_FILE_CHOOSER_ACTION_OPEN, "_Import", "_Cancel");
+    if (!config->last_open_file.empty()) {
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(native), config->last_open_file.c_str());
+    }
 
     const int result = gtk_native_dialog_run(GTK_NATIVE_DIALOG(native));
     const std::string file_path = [&]() {
@@ -265,6 +268,8 @@ void MainWindow::ImportBinaryDump() {
     if (result != GTK_RESPONSE_ACCEPT) {
         return;
     }
+
+    config->last_open_file = file_path;
 
     std::fstream dump_stream(file_path, std::ios_base::in | std::ios_base::binary);
     if (!dump_stream.is_open()) {

@@ -15,6 +15,7 @@
 
 const char* json_localization_key = "localization";
 const char* json_seeds_key = "seeds";
+const char* json_last_open_key = "last_open_file";
 const SplLocalization localization_default = SplLocalization::USen;
 
 Config::Config(const std::filesystem::path& path) : config_path{path} {
@@ -41,6 +42,11 @@ Config::Config(const std::filesystem::path& path) : config_path{path} {
             seeds.insert(x);
         }
     }
+
+    const auto& json_last_open = config_json[json_last_open_key];
+    if (json_last_open.is_string()) {
+        last_open_file = json_last_open.get<std::string>();
+    }
 }
 
 Config::~Config() {
@@ -48,6 +54,7 @@ Config::~Config() {
     nlohmann::json json_data;
     json_data[json_localization_key] = localization;
     json_data[json_seeds_key] = seeds;
+    json_data[json_last_open_key] = last_open_file;
     const std::string json_text = json_data.dump();
 
     // Make sure the config base directory exists
