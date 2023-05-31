@@ -14,7 +14,7 @@ Currently, it is capable of:
 - Updating a [leanny.github.io/splat3seedchecker](https://leanny.github.io/splat3seedchecker/#/) database backup
 
 Additionally, the GTK+ frontend can:
-- Displaying seeds for individual gear items
+- Display seeds for individual gear items
 - Display translations for gear items in the supported languages
 - Display gear abilities when the gear item has them
 
